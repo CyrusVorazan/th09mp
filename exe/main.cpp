@@ -5,7 +5,7 @@
 #include "inject.h"
 
 const std::string dll_name("inject.dll");
-const std::string exe_path("D:\\OneDrive\\Touhou Project\\Touhou 9 Kaeidzuka - Phantasmagoria of Flower View\\Kaeidzuka\\th09.exe");
+const std::string exe_path("Path_to_th09.exe_here");
 
 bool InjectDll(HANDLE process, const std::string& dll_path) {
    size_t arg_size = ::strlen(dll_path.c_str()) + 1;
