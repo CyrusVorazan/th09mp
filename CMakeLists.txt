@@ -5,7 +5,6 @@ add_executable(th09mp exe/main.cpp)
 add_library(inject SHARED 
 	inject/callback.cpp 	inject/callback.h 
 	inject/inject.cpp 		inject/inject.h 
-	inject/state.cpp 		inject/state.h 
 	inject/th09address.cpp 	inject/th09address.h 
 	inject/th09types.h 
 	inject/main.cpp
