@@ -4,8 +4,7 @@
 #include <Shlwapi.h>
 #include "inject.h"
 
-const std::string dll_name("inject.dll");
-const std::string exe_path("Path_to_th09.exe_here");
+// TODO: switch to Windows API unicode functions
 
 bool InjectDll(HANDLE process, const std::string& dll_path) {
    size_t arg_size = ::strlen(dll_path.c_str()) + 1;
@@ -39,31 +38,28 @@ bool InjectDll(HANDLE process, const std::string& dll_path) {
    return true;
 }
 
-void BuildDllPath(std::string& out)
+void BuildAbsolutePath(std::string& out, const char *name)
 {
-    char str[0x800];
+    char str[MAX_PATH];
     ::GetModuleFileNameA(NULL, str, sizeof(str)/sizeof(str[0]));
     out.append(str, strrchr(str, '\\'));
     out.append("\\");
-    out.append(dll_name);
+    out.append(name);
 }
 
 int main(int argc, char** argv){
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    ::ZeroMemory(&si, sizeof(si));
+	STARTUPINFO si = {};
+	PROCESS_INFORMATION pi = {};
     si.cb = sizeof(si);
-    ::ZeroMemory(&pi, sizeof(pi));
-    int buff_len = exe_path.size() + 1;
-    char* current_dir = new char[buff_len];
-    ::strcpy_s(current_dir, buff_len, exe_path.c_str());
-    ::PathRemoveFileSpecA(current_dir);
-    if(!::CreateProcess(exe_path.c_str(), NULL, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS | CREATE_SUSPENDED, NULL, current_dir, &si, &pi)){
+	std::string exe_path;
+	BuildAbsolutePath(exe_path, "th09.exe");
+
+
+    if(!::CreateProcess(exe_path.c_str(), NULL, NULL, NULL, FALSE, NORMAL_PRIORITY_CLASS | CREATE_SUSPENDED, NULL, NULL, &si, &pi)){
         return 1;
     }
-    delete[] current_dir;
     std::string dll_path;
-    BuildDllPath(dll_path);
+    BuildAbsolutePath(dll_path, "inject.dll");
     std::cerr << "DLL path:" << dll_path << std::endl;
     if(!InjectDll(pi.hProcess, dll_path)){
         ::CloseHandle(pi.hProcess);
