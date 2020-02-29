@@ -7,4 +7,5 @@ namespace th09mp
    void InjectOnReplayUpdate(void);
    void InjectOnGameStart(void);
    void InjectOnGameEnd(void);
+   void InjectOnRNG(void);
 }

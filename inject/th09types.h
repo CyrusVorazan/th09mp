@@ -277,6 +277,11 @@ namespace th09mp {
             int komachi;
             int eiki;
         };
+		struct RNGSeed {
+			unsigned short seed;
+			unsigned short unused;
+			unsigned int count;
+		};
 #pragma pack(pop)
     }
 }

@@ -6,7 +6,7 @@ add_library(inject SHARED
 	inject/callback.cpp 	inject/callback.h 
 	inject/inject.cpp 		inject/inject.h 
 	inject/th09address.cpp 	inject/th09address.h 
-	inject/th09types.h 
+	inject/th09types.h 		inject/globals.h
 	inject/main.cpp
 	)
 

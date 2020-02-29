@@ -6,13 +6,14 @@
 #include "inject.h"
 
 void Attach(HANDLE hModule){
-    char* title_ver_1_5 = "“Œ•û‰Ô‰f’Ë@` Phantasmagoria of Flower View. ver 1.50a";
+    const char* title_ver_1_5 = "“Œ•û‰Ô‰f’Ë@` Phantasmagoria of Flower View. ver 1.50a";
     if (::memcmp(th09mp::address::addr_window_title.ver1_5, title_ver_1_5, ::strlen(title_ver_1_5)) == 0)
     {
        th09mp::InjectOnFrameUpdate();
        th09mp::InjectOnReplayUpdate();
        th09mp::InjectOnGameStart();
        th09mp::InjectOnGameEnd();
+	   th09mp::InjectOnRNG();
 
        // Temporary, for debugging
        AllocConsole();

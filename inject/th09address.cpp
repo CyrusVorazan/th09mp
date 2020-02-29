@@ -15,7 +15,10 @@ namespace th09mp {
         };
         const struct Address addr_window_title = {
             reinterpret_cast<char*>(0x4901E4)
-        };
+		};
+		const struct Address addr_on_rng = {
+			reinterpret_cast<char*>(0x42AE20)
+		};
         struct raw_types::ExAttackFuncAddr ex_attack_func_addr_ver1_5 = {
             0x441100,
             0x441A70,
