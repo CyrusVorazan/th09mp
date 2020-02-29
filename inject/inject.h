@@ -8,4 +8,5 @@ namespace th09mp
    void InjectOnGameStart(void);
    void InjectOnGameEnd(void);
    void InjectOnRNG(void);
+   void InjectOnZUNNetplay(void);
 }

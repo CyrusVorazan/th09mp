@@ -123,6 +123,9 @@ namespace th09mp
 			ret
 	   }
    }
+   void OnZUNNetplayInit(void) {
+
+   }
 
 #pragma warning( disable : 4309 )
    void InjectOnFrameUpdate(void)
@@ -208,6 +211,20 @@ namespace th09mp
 		   0xE9, 0, 0, 0, 0
 	   };
 	   SetJumpTo(code + 1, (int)(inject_to + 5), (int)OnRNGVer1_5);
+	   WriteCode(inject_to, code, sizeof(code));
+   }
+
+   void InjectOnZUNNetplay(void) {
+	   char* inject_to = th09mp::address::addr_zun_netplay_init.ver1_5;
+	   char code[] = {
+			0xC7, 0x05,  0xA4, 0x7E, 0x4A, 0x00,  0x00, 0x00, 0x00, 0x00, 
+			0xC7, 0x06, 0x00, 0x00, 0x00, 0x00,
+			0x60,
+			0xE8,  0x00, 0x00, 0x00, 0x00, 
+			0x61,
+			0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90
+	   };
+	   SetJumpTo(code + 18, (int)inject_to + 22, (int)OnZUNNetplayInit);
 	   WriteCode(inject_to, code, sizeof(code));
    }
 #pragma warning( default : 4309 )

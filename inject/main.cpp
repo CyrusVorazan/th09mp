@@ -14,6 +14,7 @@ void Attach(HANDLE hModule){
        th09mp::InjectOnGameStart();
        th09mp::InjectOnGameEnd();
 	   th09mp::InjectOnRNG();
+	   th09mp::InjectOnZUNNetplay();
 
        // Temporary, for debugging
        AllocConsole();

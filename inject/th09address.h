@@ -46,6 +46,7 @@ namespace th09mp {
         extern const struct Address addr_on_game_end;
 		extern const struct Address addr_window_title;
 		extern const struct Address addr_on_rng;
+		extern const struct Address addr_zun_netplay_init;
         extern struct Th9GlobalVer1_5* const globals_ver1_5;
     }
 }

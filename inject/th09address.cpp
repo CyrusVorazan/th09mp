@@ -19,6 +19,9 @@ namespace th09mp {
 		const struct Address addr_on_rng = {
 			reinterpret_cast<char*>(0x42AE20)
 		};
+		const struct Address addr_zun_netplay_init = {
+			reinterpret_cast<char*>(0x42A834)
+		};
         struct raw_types::ExAttackFuncAddr ex_attack_func_addr_ver1_5 = {
             0x441100,
             0x441A70,
