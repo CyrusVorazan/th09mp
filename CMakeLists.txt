@@ -7,6 +7,7 @@ add_library(inject SHARED
 	inject/inject.cpp 		inject/inject.h 
 	inject/th09address.cpp 	inject/th09address.h 
 	inject/th09types.h 		inject/globals.h
+	inject/breakpoint.cpp	inject/breakpoint.h
 	inject/main.cpp
 	)
 
