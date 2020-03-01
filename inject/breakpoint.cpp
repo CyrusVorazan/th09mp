@@ -6,7 +6,7 @@
 
 namespace th09mp {
 
-	uint32_t BPProcess(struct th09mp::BPInfo* BPInfo, struct th09mp::x86Regs* Regs) {
+	uint32_t __stdcall BPProcess(struct th09mp::BPInfo* BPInfo, struct th09mp::x86Regs* Regs) {
 		uint32_t esp_previous = Regs->esp;
 		
 		th09mp::BPCaveExec DoCaveExec = BPInfo->BPFunc(Regs, BPInfo->BPParams);
