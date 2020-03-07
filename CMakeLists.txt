@@ -8,7 +8,7 @@ add_library(inject SHARED
 	inject/th09address.cpp 	inject/th09address.h 
 	inject/th09types.h 		inject/globals.h
 	inject/breakpoint.cpp	inject/breakpoint.h
-	inject/main.cpp
+	inject/main.cpp			inject/inject.def
 	)
 
 target_link_libraries(th09mp shlwapi)
