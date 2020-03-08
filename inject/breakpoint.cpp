@@ -54,7 +54,7 @@ namespace th09mp {
 
 		int BPCaveByte = 0;
 		while(BPCaveByte < Cavesize) {
-			if ((Breakpoint->BPInfo.Cave[BPCaveByte] & 0xE8) || (Breakpoint->BPInfo.Cave[BPCaveByte] & 0xE9)) {
+			if ((Breakpoint->BPInfo.Cave[BPCaveByte] == (char)0xE8) || (Breakpoint->BPInfo.Cave[BPCaveByte] == (char)0xE9)) {
 				uint32_t CallAddr = addr + *(int*)&Breakpoint->BPInfo.Cave[BPCaveByte + 1] + 5;
 				SetJumpTo(&Breakpoint->BPInfo.Cave[BPCaveByte + 1], (int)&Breakpoint->BPInfo.Cave[BPCaveByte + 5], CallAddr);
 				BPCaveByte += 5;
