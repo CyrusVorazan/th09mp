@@ -3,6 +3,8 @@
 #include "th09address.h"
 #include "callback.h"
 #include "globals.h"
+#include "breakpoint.h"
+#include "menu.h"
 
 #include <Windows.h>
 
@@ -227,5 +229,11 @@ namespace th09mp
 	   SetJumpTo(code + 18, (int)inject_to + 22, (int)OnZUNNetplayInit);
 	   WriteCode(inject_to, code, sizeof(code));
    }
+
+   void InjectOnDifficultyMenu(void) {
+	   BPCreate(0x42A69A, th09mp::BPOnShowDifficultyMenu, nullptr, 0, 5);
+	   BPCreate(0x42A4AC, th09mp::BPOnDifficultyMenuCursorMove, nullptr, 0, 5);
+   }
+
 #pragma warning( default : 4309 )
 }

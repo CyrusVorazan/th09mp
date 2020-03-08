@@ -4,6 +4,7 @@
 #include <string>
 
 #include "inject.h"
+#include "menu.h"
 
 namespace th09mp {
 	HMODULE hModule;
@@ -37,6 +38,7 @@ extern "C" {
 			th09mp::InjectOnGameEnd();
 			th09mp::InjectOnRNG();
 			th09mp::InjectOnZUNNetplay();
+			th09mp::InjectOnDifficultyMenu();
 
 			// Temporary, for debugging
 			AllocConsole();

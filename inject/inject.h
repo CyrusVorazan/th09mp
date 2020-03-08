@@ -9,6 +9,7 @@ namespace th09mp
    void InjectOnGameEnd(void);
    void InjectOnRNG(void);
    void InjectOnZUNNetplay(void);
+   void InjectOnDifficultyMenu(void);
 
    void SetJumpTo(char* code, int from, int to);
    void WriteCode(char* inject_to, char* new_code, size_t size);

@@ -1,5 +1,5 @@
 #pragma once
 namespace th09mp {
-	bool netplay_enabled;
-	bool host;
+	bool netplay_enabled = false;
+	bool host = false;
 }
