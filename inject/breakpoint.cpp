@@ -48,6 +48,22 @@ namespace th09mp {
 		Breakpoint->BPInfo.Cave[Cavesize] = 0xE9;
 		SetJumpTo(&Breakpoint->BPInfo.Cave[Cavesize + 1], (int)&Breakpoint->BPInfo.Cave[Cavesize + 5], addr + Cavesize);
 
+		#define BPCave Breakpoint->BPInfo.Cave
+
+		int BPCaveByte = 0;
+		while(BPCaveByte < Cavesize) {
+			if (BPCave[BPCaveByte] == 0xE9 || BPCave[BPCaveByte] == 0xE8) {
+				uint32_t CallAddr = addr + *(int*)&BPCave[BPCaveByte + 1] + 5;
+				SetJumpTo(&BPCave[BPCaveByte + 1], (int)&BPCave[BPCaveByte + 5], CallAddr);
+				BPCaveByte += 5;
+				continue;
+			}
+			else {
+				BPCaveByte += 1;
+				continue;
+			}
+		}
+
 		Breakpoint->BPInfo.BPFunc = Func;
 		Breakpoint->BPInfo.BPAddr = addr;
 		Breakpoint->BPInfo.Cavesize = Cavesize;
