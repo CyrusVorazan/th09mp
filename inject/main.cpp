@@ -20,6 +20,9 @@ extern "C" {
 			if (runconfig_get && json_object_get_string) {
 				void* run_cfg = runconfig_get();
 				const char* game_id = json_object_get_string(run_cfg, "game");
+				if (!game_id) {
+					return 1;
+				}
 				if (strcmp(game_id, "th09") != 0) {
 					return 1;
 				}
