@@ -26,6 +26,8 @@ extern "C" {
 				if (strcmp(game_id, "th09") != 0) {
 					return 1;
 				}
+			} else {
+				return 1;
 			}
 		}
 
