@@ -1,12 +1,36 @@
 #include "inject.h"
 
 #include "th09address.h"
+#include "th09types.h"
 #include "callback.h"
-#include "globals.h"
 #include "breakpoint.h"
 #include "menu.h"
 
 #include <Windows.h>
+
+HHOOK m_hHook;
+
+// TODO: Move this to some other file. I need a procedure that would send local menu inputs to the remote peer and apply remote peer's inputs locally.
+LRESULT CALLBACK MessageHookProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    LPMSG pMsg = reinterpret_cast<LPMSG>(lParam);
+
+    if (nCode == HC_ACTION)
+    {
+        switch (pMsg->message)
+        {
+        case WM_SYSCOMMAND:
+            break;
+
+        case WM_KEYDOWN:
+            break;
+
+        case WM_SYSKEYDOWN:
+            break;
+        }
+    }
+    return CallNextHookEx(m_hHook, nCode, wParam, lParam);
+}
 
 namespace th09mp
 {
@@ -86,37 +110,13 @@ namespace th09mp
 	   }
    }
 
-   SHORT __fastcall NetRNG(struct th09mp::raw_types::RNGSeed* seed) {
-	   /*
-
-		if(host) {
-			SHORT rng = ZUNRNG(seed);
-			RNGQueue.push(rng); // std::queue
-			return rng;
-		} else if (netplay_enabled) {
-			while(RNGqueue.empty() {
-				MSG msg = { };
-				// GetMessage will not return until a message is part of the message queue
-				// Therefore the game will freeze in place until a new RNG value is recieved by the network thread
-				// The network thread will then send a message to the game's main thread every time the RNG queue gets a value
-
-				::GetMessage(&msg, NULL, 0, 0);
-
-				// Allow closing the game (I am not worrying about leftover memory and file handles because Windows clears those automatically)
-				if(msg.message = WM_CLOSE || msg.message = WM_QUIT) {
-					::ExitProcess(0);
-				}
-			}
-			return RNGQueue.pop();
-		} else {
-			return ZUNRNG(seed)
-		}
-	   
-	   */
+   SHORT __fastcall NetRNG(struct th09mp::raw_types::RNGSeed* seed) 
+   {
 	   return ZUNRNG(seed);
    }
 
-   SHORT __declspec(naked) __fastcall OnRNGVer1_5(struct th09mp::raw_types::RNGSeed* seed) {
+   SHORT __declspec(naked) __fastcall OnRNGVer1_5(struct th09mp::raw_types::RNGSeed* seed) 
+   {
 	   // Written in Assembly because full control over the registers is required
 	   __asm {
 			push ecx
@@ -127,6 +127,13 @@ namespace th09mp
    }
    void OnZUNNetplayInit(void) {
 
+   }
+
+   th09mp::BPCaveExec BPOnWindowCreated(struct x86Regs* Regs, void* BPParams)
+   {
+       // TODO: unregister the hook. Need to figure out when and where.
+       m_hHook = SetWindowsHookEx(WH_GETMESSAGE, MessageHookProc, nullptr, GetCurrentThreadId());
+       return th09mp::BPCaveExec::True;
    }
 
 #pragma warning( disable : 4309 )
@@ -231,9 +238,11 @@ namespace th09mp
    }
 
    void InjectOnDifficultyMenu(void) {
+
+       BPCreate(0x42D5D1, BPOnWindowCreated, nullptr, 0, 5); // or 0x42F00A
+
 	   BPCreate(0x42A69A, th09mp::BPOnShowDifficultyMenu, nullptr, 0, 5);
 	   BPCreate(0x42A4AC, th09mp::BPOnDifficultyMenuCursorMove, nullptr, 0, 5);
    }
-
 #pragma warning( default : 4309 )
 }

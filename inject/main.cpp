@@ -37,6 +37,22 @@ extern "C" {
 		const char* title_ver_1_5 = "ìåï˚â‘âfíÀÅ@Å` Phantasmagoria of Flower View. ver 1.50a";
 		if (::memcmp(th09mp::address::addr_window_title.ver1_5, title_ver_1_5, ::strlen(title_ver_1_5)) == 0)
 		{
+			// Temporary, for debugging
+			AllocConsole();
+			FILE* fDummy;
+			freopen_s(&fDummy, "CONIN$", "r", stdin);
+			freopen_s(&fDummy, "CONOUT$", "w", stderr);
+			freopen_s(&fDummy, "CONOUT$", "w", stdout);
+
+			// Disable multiple instance launch protection
+			char code[] = {
+				0xEB
+			}; 
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42D928), code, sizeof(code));
+			
+			// Disable automatic demo replay playback
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42A153), code, sizeof(code));
+
 			th09mp::InjectOnFrameUpdate();
 			th09mp::InjectOnReplayUpdate();
 			th09mp::InjectOnGameStart();
@@ -44,13 +60,6 @@ extern "C" {
 			th09mp::InjectOnRNG();
 			th09mp::InjectOnZUNNetplay();
 			th09mp::InjectOnDifficultyMenu();
-
-			// Temporary, for debugging
-			AllocConsole();
-			FILE* fDummy;
-			freopen_s(&fDummy, "CONIN$", "r", stdin);
-			freopen_s(&fDummy, "CONOUT$", "w", stderr);
-			freopen_s(&fDummy, "CONOUT$", "w", stdout);
 			return 0;
 		}
 		else
@@ -62,7 +71,6 @@ extern "C" {
 }
 
 void Detach(void){
-
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserved){
