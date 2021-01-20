@@ -1,0 +1,6 @@
+[submodule "lib/RakNet"]
+	path = lib/RakNet
+	url = https://github.com/facebookarchive/RakNet
+[submodule "lib/imgui"]
+	path = lib/imgui
+	url = https://github.com/ocornut/imgui
