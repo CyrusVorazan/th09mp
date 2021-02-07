@@ -22,7 +22,9 @@ namespace th09mp {
     
     namespace network
     {
+        extern bool isHost;
         extern bool connected;
+        extern PlayerSide hostSide;
     }
 
     HHOOK ms_hHook;
@@ -172,8 +174,9 @@ namespace th09mp {
                     // Not sure how to handle choice conflicts. Simplest way would be to just not start the game until the choices are consistent. Perhaps host preference.
                     // Host also may choose to be a spectator, hosting a game for two client players
 
-                    //static int selected_side = 0;
-                    //PopupSelect("Side", { "Left", "Right" }, &selected_side);
+                    static int selected_side = 0;
+                    PopupSelect("Side", { "Left", "Right" }, &selected_side);
+                    network::hostSide = (PlayerSide)selected_side;
 
                     if (ImGui::Button("Host the game"))
                     {
@@ -184,7 +187,7 @@ namespace th09mp {
                 if (selected_mode > 0)
                 {
                     // Show client/spectator options
-                    static char ip[128] = "192.168.0.105";
+                    static char ip[128] = "192.168.0.107";
                     ImGui::InputText("IP Address", ip, IM_ARRAYSIZE(ip));
 
                     static int port = 17723;
@@ -236,19 +239,6 @@ namespace th09mp {
 
         UnhookWindowsHookEx(ms_hHook);
     }
-
-	th09mp::BPCaveExec BPOnShowDifficultyMenu(struct x86Regs* Regs, void* BPParams) { 
-        ShowImGuiNetplayMenu();
-		return BPCaveExec::True;
-	}
-
-	th09mp::BPCaveExec BPOnDifficultyMenuCursorMove(struct x86Regs* Regs, void* BPParams) { 
-		//if (netplay_enabled) {
-		//	Regs->esp += 8;
-		//	return BPCaveExec::False;
-		//}
-		return BPCaveExec::True; 
-	}
 }
 
 

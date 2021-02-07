@@ -26,6 +26,7 @@ namespace th09mp {
    enum PlayerSide {
       Side_1P = 0,
       Side_2P = 1,
+      Side_3P = 2,
    };
 
    enum GameStatus {

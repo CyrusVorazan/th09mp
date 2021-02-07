@@ -6,6 +6,7 @@
 #include "RakPeerInterface.h"
 #include "RakNetTypes.h"
 #include "BitStream.h"
+#include "state.h"
 
 #include <iostream>
 
@@ -15,7 +16,9 @@ RakNet::AddressOrGUID clientAddress;
 enum GameMessages
 {
     ID_SEED_MESSAGE = ID_USER_PACKET_ENUM + 1,
-    ID_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 2
+    ID_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 2,
+    ID_MENU_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 3,
+    ID_HOST_SIDE_MESSAGE = ID_USER_PACKET_ENUM + 4
 };
 
 namespace th09mp {
@@ -25,6 +28,7 @@ namespace th09mp {
         std::map<unsigned int, unsigned short> inputStore;
         bool connected = false;
         bool isHost = false;
+        PlayerSide hostSide = PlayerSide::Side_1P;
 
         void ProcessPacket(RakNet::Packet* packet)
         {
@@ -62,6 +66,39 @@ namespace th09mp {
                 connected = true;
                 break;
             }
+            case ID_HOST_SIDE_MESSAGE:
+            {
+                bsIn.Read(network::hostSide);
+                break;
+            }
+            case ID_MENU_INPUT_MESSAGE:
+            {
+                unsigned int receivedSystemKeys;
+                bsIn.Read(receivedSystemKeys);
+                if (receivedSystemKeys != 0)
+                {
+                    std::cout << "Receiving keys " << receivedSystemKeys << std::endl;
+                    // This function processes all packets at once, but input packets should be applied each frame
+                    
+                    SetInputState(PlayerSide::Side_3P, receivedSystemKeys, true/*setSystemKeys*/);
+                    if (isHost)
+                    {
+                        if (hostSide == PlayerSide::Side_2P)
+                            SetInputState(PlayerSide::Side_1P, receivedSystemKeys, true/*setSystemKeys*/);
+                        else
+                            SetInputState(PlayerSide::Side_2P, receivedSystemKeys, true/*setSystemKeys*/);
+                    }
+                    else
+                    {
+                        if (hostSide == PlayerSide::Side_2P)
+                            SetInputState(PlayerSide::Side_2P, receivedSystemKeys, true/*setSystemKeys*/);
+                        else
+                            SetInputState(PlayerSide::Side_1P, receivedSystemKeys, true/*setSystemKeys*/);
+                    }
+                }
+
+                break;
+            }
             case ID_REMOTE_DISCONNECTION_NOTIFICATION:
                 printf("Another client has disconnected.\n");
                 break;
@@ -87,6 +124,8 @@ namespace th09mp {
 
                 SendRngSeed(th09mp::address::globals_ver1_5->rng[0]);
                 th09mp::address::globals_ver1_5->rng[1] = 0;
+
+                SendSide((int)hostSide);
 
                 connected = true;
                 break;
@@ -116,6 +155,14 @@ namespace th09mp {
             }
         }
 
+        void SendSide(unsigned int side)
+        {
+            RakNet::BitStream bsOut;
+            bsOut.Write((RakNet::MessageID)ID_HOST_SIDE_MESSAGE);
+            bsOut.Write(side);
+            peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+        }
+
         void ProcessPackets()
         {
             RakNet::Packet* packet = nullptr;
@@ -139,12 +186,40 @@ namespace th09mp {
             peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
         }
 
+        void SendMenuInput(unsigned int message, unsigned int wParam, long lParam)
+        {
+            if (peer->GetConnectionState(clientAddress) == RakNet::ConnectionState::IS_CONNECTED)
+            {
+                RakNet::BitStream bsOut;
+                bsOut.Write((RakNet::MessageID)ID_MENU_INPUT_MESSAGE);
+                bsOut.Write(message);
+                bsOut.Write(wParam);
+                bsOut.Write(lParam);
+
+                peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+            }
+        }
+
         void SendRngSeed(unsigned int seed)
         {
             RakNet::BitStream bsOut;
             bsOut.Write((RakNet::MessageID)ID_SEED_MESSAGE);
             bsOut.Write(seed);
             peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+        }
+
+        void SendSystemKeys(unsigned int systemKeys)
+        {
+            RakNet::BitStream bsOut;
+            bsOut.Write((RakNet::MessageID)ID_MENU_INPUT_MESSAGE);
+            bsOut.Write(systemKeys);
+
+            if (systemKeys != 0)
+                std::cout << "Sending keys " << systemKeys << std::endl;
+
+            uint32_t retCode = peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+            if (retCode == 0)
+                std::cout << "Something went wrong!" << std::endl;
         }
 
         void Connect(std::string ip, int port)

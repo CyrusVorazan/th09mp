@@ -45,21 +45,47 @@ extern "C" {
 			freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
 			// Disable multiple instance launch protection
-			char code[] = {
+			char jmp[] = {
 				0xEB
 			}; 
-			th09mp::WriteCode(reinterpret_cast<char*>(0x42D928), code, sizeof(code));
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42D928), jmp, sizeof(jmp));
 			
 			// Disable automatic demo replay playback
-			th09mp::WriteCode(reinterpret_cast<char*>(0x42A153), code, sizeof(code));
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42A153), jmp, sizeof(jmp));
 
-			th09mp::InjectOnFrameUpdate();
-			th09mp::InjectOnReplayUpdate();
-			th09mp::InjectOnGameStart();
-			th09mp::InjectOnGameEnd();
-			th09mp::InjectOnRNG();
-			th09mp::InjectOnZUNNetplay();
-			th09mp::InjectOnDifficultyMenu();
+			char jmpTo[] = {
+				0xE9, 0, 0, 0, 0
+			};
+
+			// Theoretically, th09mp may be executed with or without command-line parameters.
+			// If it does, it makes sense to enable netplay and skip irrelevant menus right away.
+			// Alternatively, the game might be launched as usual and netplay will be initialized 
+			// only when the built-in netplay menu option is selected.
+			// For now, th09mp assumes that netplay is enabled by default.
+			constexpr bool netplayIsEnabled = true;
+			if (netplayIsEnabled)
+			{
+				// Skip main menu to match mode selection
+				char* inject_to = (char*)0x42A1C8;
+				th09mp::SetJumpTo(jmpTo + 1, (int)(inject_to + 5), (int)0x42A23C);
+				th09mp::WriteCode(inject_to, jmpTo, sizeof(jmpTo));
+
+				// Skip match mode to human vs human selection
+				inject_to = (char*)0x42A822;
+				th09mp::SetJumpTo(jmpTo + 1, (int)(inject_to + 5), (int)0x42A828);
+				th09mp::WriteCode(inject_to, jmpTo, sizeof(jmpTo));
+			}
+
+			//th09mp::InjectOnFrameUpdate();
+			//th09mp::InjectOnReplayUpdate();
+			//th09mp::InjectOnGameStart();
+			//th09mp::InjectOnGameEnd();
+			//th09mp::InjectOnRNG();
+			//th09mp::InjectOnZUNNetplay();
+			//th09mp::InjectOnDifficultyMenu();
+
+			th09mp::InjectCallbacks();
+
 			return 0;
 		}
 		else

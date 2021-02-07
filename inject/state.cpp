@@ -4,6 +4,17 @@
 
 namespace th09mp
 {
+    void SetInputState(PlayerSide side, unsigned short newKeys, bool setSystemKeys, bool addKeys)
+    {
+        th09mp::address::Th9GlobalVer1_5* g = address::globals_ver1_5;
+
+        unsigned short& keys = setSystemKeys ? g->key_states[side].system_keys : g->key_states[side].keys;
+        keys = addKeys ? keys | newKeys : newKeys;
+        unsigned short changed_keys = keys ^ g->key_states[side].prev_keys;
+        g->key_states[side].start_pushing_keys = changed_keys & keys;
+        g->key_states[side].start_leaving_keys = changed_keys & ~keys;
+    }
+
     // WARNING: this code is experimental and unfinished and all sorts of bad. It's used only to test if the game has deterministic state.
 
    void CopyVector2D(raw_types::Vector2D& dst, raw_types::Vector2D src)

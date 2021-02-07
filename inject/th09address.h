@@ -9,11 +9,13 @@ namespace th09mp {
             struct raw_types::Board board[2];//4A7D94
             char unknown1[0x4A7E3C - 0x4A7D94 - sizeof(raw_types::Board)*2];
             struct raw_types::ExAttackContainer* ex_attack_container;//4A7E3C
+            char unknown21[0x4A7E44 - 0x4A7E3C - sizeof(raw_types::ExAttackContainer*)];
+            int rank;
             // 4A7E44 - Rank [1, 22]
             // 4A7E54 - Rank increase period [1, 0x7fffffff]
             // 4A7E58 - Maximum rank [1, 22]
             // 4A7E5C - Lily appearance counter [0, 0x7fffffff]
-            char unknown2[0x4A7E90 - 0x4A7E3C - sizeof(raw_types::ExAttackContainer*)];
+            char unknown2[0x4A7E90 - 0x4A7E44 - sizeof(int)];
             unsigned int round;//4A7E90
             char unknown3[4];
             unsigned int round_win[2];//4A7E98
@@ -33,6 +35,7 @@ namespace th09mp {
 
             struct raw_types::KeyState key_states[3]; // 0x4ACE18
 
+            // 4acfc8 - some struct
 
             char unknown7[0x4B30B0 - 0x4ACE18 - sizeof(raw_types::KeyState) * 3];
 
@@ -47,12 +50,17 @@ namespace th09mp {
             int** dinput8_device;//4B3110 - LPDIRECTINPUTDEVICE8* (keyboard)
             //unknown
             //4B3174 - copy of 4B30B0 HWND
+
+
+            //4b3450 - D3DPRESENT_PARAMETERS
             char unknown9[0x4B353C - 0x4B3110 - sizeof(int**)];
             
             //char unknown9[0x4B353C - 0x4B3108 - sizeof(int**)];
-            char charge_types[2];
+            char charge_types[2]; // 0x4b353c - 0x4b353d
             char unknown10[0x4B42D0 - 0x4B353C - sizeof(char)*2];
             struct raw_types::NetInfo* net_info;//4B42D0
+
+            // 4dc544 - IDirect3DSurface8
         };
 #pragma pack(pop)
 
