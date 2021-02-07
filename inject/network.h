@@ -10,7 +10,9 @@ namespace th09mp {
 	{
 		void ProcessPackets();
 		void SendInputData(std::map<unsigned int, unsigned short> inputData);
+		void SendMenuInput(unsigned int message, unsigned int wParam, long lParam);
 		void SendRngSeed(unsigned int seed);
+		void SendSystemKeys(unsigned int systemKeys);
 
 		void Connect(std::string ip, int port);
 		void Host(int port);

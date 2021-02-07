@@ -15,7 +15,8 @@ RakNet::AddressOrGUID clientAddress;
 enum GameMessages
 {
     ID_SEED_MESSAGE = ID_USER_PACKET_ENUM + 1,
-    ID_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 2
+    ID_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 2,
+    ID_MENU_INPUT_MESSAGE = ID_USER_PACKET_ENUM + 3
 };
 
 namespace th09mp {
@@ -60,6 +61,33 @@ namespace th09mp {
                 bsIn.Read(th09mp::address::globals_ver1_5->rng[0]);
                 th09mp::address::globals_ver1_5->rng[1] = 0;
                 connected = true;
+                break;
+            }
+            case ID_MENU_INPUT_MESSAGE:
+            {
+                //UINT msg;
+                //bsIn.Read(msg);
+                //WPARAM wparam;
+                //bsIn.Read(wparam);
+                //LPARAM lparam;
+                //bsIn.Read(lparam);
+
+                //if (msg == WM_KEYDOWN)
+                //{
+                //    //th09mp::address::globals_ver1_5->key_states[2].system_keys = Keys::down;
+                //}
+
+                unsigned int receivedSystemKeys;
+                bsIn.Read(receivedSystemKeys);
+                if (receivedSystemKeys != 0)
+                {
+                    // This function processes all packets at once, but input packets should be applied each frame
+                    th09mp::address::globals_ver1_5->key_states[2].system_keys |= receivedSystemKeys;
+                    unsigned short changed_keys = th09mp::address::globals_ver1_5->key_states[2].system_keys ^ th09mp::address::globals_ver1_5->key_states[2].prev_keys;
+                    th09mp::address::globals_ver1_5->key_states[2].start_pushing_keys = changed_keys & th09mp::address::globals_ver1_5->key_states[2].system_keys;
+                    th09mp::address::globals_ver1_5->key_states[2].start_leaving_keys = changed_keys & ~th09mp::address::globals_ver1_5->key_states[2].system_keys;
+                }
+
                 break;
             }
             case ID_REMOTE_DISCONNECTION_NOTIFICATION:
@@ -139,11 +167,34 @@ namespace th09mp {
             peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
         }
 
+        void SendMenuInput(unsigned int message, unsigned int wParam, long lParam)
+        {
+            if (peer->GetConnectionState(clientAddress) == RakNet::ConnectionState::IS_CONNECTED)
+            {
+                RakNet::BitStream bsOut;
+                bsOut.Write((RakNet::MessageID)ID_MENU_INPUT_MESSAGE);
+                bsOut.Write(message);
+                bsOut.Write(wParam);
+                bsOut.Write(lParam);
+
+                peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+            }
+        }
+
         void SendRngSeed(unsigned int seed)
         {
             RakNet::BitStream bsOut;
             bsOut.Write((RakNet::MessageID)ID_SEED_MESSAGE);
             bsOut.Write(seed);
+            peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
+        }
+
+        void SendSystemKeys(unsigned int systemKeys)
+        {
+            RakNet::BitStream bsOut;
+            bsOut.Write((RakNet::MessageID)ID_MENU_INPUT_MESSAGE);
+            bsOut.Write(systemKeys);
+
             peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, clientAddress, false);
         }
 

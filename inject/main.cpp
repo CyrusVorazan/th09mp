@@ -45,13 +45,27 @@ extern "C" {
 			freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
 			// Disable multiple instance launch protection
-			char code[] = {
+			char jmp[] = {
 				0xEB
 			}; 
-			th09mp::WriteCode(reinterpret_cast<char*>(0x42D928), code, sizeof(code));
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42D928), jmp, sizeof(jmp));
 			
 			// Disable automatic demo replay playback
-			th09mp::WriteCode(reinterpret_cast<char*>(0x42A153), code, sizeof(code));
+			th09mp::WriteCode(reinterpret_cast<char*>(0x42A153), jmp, sizeof(jmp));
+
+			char jmpTo[] = {
+				0xE9, 0, 0, 0, 0
+			};
+
+			// Skip main menu to match mode selection
+			char* inject_to = (char*)0x42A1C8;
+			th09mp::SetJumpTo(jmpTo + 1, (int)(inject_to + 5), (int)0x42A23C);
+			th09mp::WriteCode(inject_to, jmpTo, sizeof(jmpTo));
+
+			// Skip match mode to human vs human selection
+			inject_to = (char*)0x42A822;
+			th09mp::SetJumpTo(jmpTo + 1, (int)(inject_to + 5), (int)0x42A828);
+			th09mp::WriteCode(inject_to, jmpTo, sizeof(jmpTo));
 
 			th09mp::InjectOnFrameUpdate();
 			th09mp::InjectOnReplayUpdate();
@@ -60,6 +74,7 @@ extern "C" {
 			th09mp::InjectOnRNG();
 			th09mp::InjectOnZUNNetplay();
 			th09mp::InjectOnDifficultyMenu();
+
 			return 0;
 		}
 		else
