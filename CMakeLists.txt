@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14.0)
 project(th09mp VERSION 0.0.1)
 
+include(${CMAKE_SOURCE_DIR}/lib/CMakeLists.txt)
+
 add_executable(th09mp exe/main.cpp)
 add_library(inject SHARED 
 	inject/callback.cpp 	inject/callback.h 
@@ -30,11 +32,14 @@ target_include_directories(th09mp PRIVATE
     ${CMAKE_SOURCE_DIR}/exe
     )
 
+add_dependencies(inject RakNet)
+
 target_link_libraries(inject 
 	d3d9
 	ws2_32
-	${CMAKE_SOURCE_DIR}/lib/RakNet/Lib/RakNet_VS2008_LibStatic_Debug_Win32.lib
+	RakNet
 	)
+
 
 target_include_directories(inject PRIVATE 
 	${CMAKE_SOURCE_DIR}/inject
